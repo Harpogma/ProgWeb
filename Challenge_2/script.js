@@ -112,3 +112,36 @@ const user = {
   console.log(secondSentence)
 
   
+  function countdown(endDate) {
+    const date = new Date(endDate);
+
+    const dayNow = new Date().getDate();
+    const dayEnd = date.getDate();
+    const finalDay = dayEnd - dayNow;
+
+    const hoursNow = new Date().getHours();
+    const hoursEnd = date.getHours();
+    const finalHours = hoursEnd - hoursNow;
+
+    const minutesNow = new Date().getMinutes();
+    const minutesEnd = date.getMinutes();
+    const finalMinutes = Math.abs(minutesEnd - minutesNow);
+
+    const secondsNow = new Date().getSeconds();
+    const secondsEnd = date.getSeconds();
+    const finalSeconds = Math.abs(secondsEnd - secondsNow);
+
+    const finalString =
+      finalDay +
+      (finalDay > 1 ? " jours " : " jour ") +
+      finalHours +
+      " h " +
+      finalMinutes +
+      " min " +
+      finalSeconds +
+      " s";
+
+    return finalString;
+  }
+
+  console.log(countdown(user.nextTourDate));
