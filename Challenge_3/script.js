@@ -81,8 +81,20 @@ function calcPercentage(tableId) {
     return [taxAmount, tipAmount];
 }
 
-console.log("the total for table 0 is:");
-console.log(getSubTotal(0));
+function createBill(tableId) {
+    let subTotal = Math.round(getSubTotal(tableId) * 100) / 100;
+    let tax = calcPercentage(tableId)[0];
+    let tip = calcPercentage(tableId)[1];
+    let total = Math.round((subTotal + tax + tip) * 100) / 100;
+        
+    return {
+        subtotal: subTotal,
+        tax: tax,
+        tip: tip,
+        total: `CHF: ${total}`
+    };
+}
 
-console.log("the tax for the table 0 is:")
-console.log(calcPercentage(0));
+for (let i = 0; i < register.length; i++ ) {
+    console.log(createBill(i));
+}
