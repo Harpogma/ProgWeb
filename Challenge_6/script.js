@@ -1,42 +1,41 @@
 "use strict"
 
 const examplePoll1 = {
-    id: 1,
-    question: "What is your favorite programming language?",
-    options: ["1. JavaScript", "2. PHP", "3. Java", "4. Assembly"],
-}
+  question: "What is your favorite programming language?",
+  options: ["1. JavaScript", "2. PHP", "3. Java", "4. Assembly"],
+};
 
 const examplePoll2 = {
-    id: 2,
-    question: "Ce challenge est-il difficile?",
-    options: ["Oui", "Non"],
-}
+  question: "Ce challenge est-il difficile?",
+  options: ["Oui", "Non"],
+};
 
-const questionPoll = obj => {
-    console.log(`${obj.question}`),
-    console.log(`${obj.options.join(', ')}`)
+const createPoll = (obj) => {
+  const question = obj.question;
+  const voteOptions = new Map();
+  const votesQuantity = new Array(voteOptions.length).fill(0);
 
-    return obj;
-}
+  let i = 1;
+  for (let opt of obj.options) {
+    voteOptions.set(i, opt);
+    i++;
+  }
 
-const answers = obj => {
-    const answers = {};
-    obj.options.forEach(el => {
-        answers[el] = 0;
-    });
+  const poll = {
+    question: obj.question,
+    options: voteOptions,
+    votes: votesQuantity,
+  };
 
-    return answers;
-}
+  function vote(answer) {
+    const vote = (poll.options[answer] += 1);
+    return vote;
+  }
+  displayPoll(poll);
 
+  return vote();
+};
 
-const answerPoll = (obj, answer) => {
-    
-    function pollAnswer (answer) {obj.answers.answer += 1};
-
-    console.log(`${obj.answers.join(', ')}`);
-
-    pollAnswer();
-
-}
-
-
+const createPoll1 = function (poll) {
+  const { question, options } = poll;
+};
