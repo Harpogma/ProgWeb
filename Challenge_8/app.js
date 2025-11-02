@@ -78,7 +78,7 @@ const calculateBalance = (acc) => {
 
 const sumIn = (acc) => {
   let sumIn = 0;
-  let onlyPositives = new Array;
+  let onlyPositives = new Array();
   if (acc) {
     for (let num of acc.movements) {
       if (num >= 0) {
@@ -86,15 +86,15 @@ const sumIn = (acc) => {
       }
     }
   }
-  onlyPositives.forEach( num => {
+  onlyPositives.forEach((num) => {
     sumIn += num;
   });
   labelSumIn.textContent = sumIn;
-}
+};
 
 const sumOut = (acc) => {
   let sumOut = 0;
-  let onlyNegatives = new Array;
+  let onlyNegatives = new Array();
   if (acc) {
     for (let num of acc.movements) {
       if (num < 0) {
@@ -102,11 +102,44 @@ const sumOut = (acc) => {
       }
     }
   }
-  onlyNegatives.forEach( num => {
+  onlyNegatives.forEach((num) => {
     sumOut += num;
   });
   labelSumOut.textContent = sumOut;
-}
+};
+
+const checkSign = (mov, el) => {
+  if (mov >= 0) {
+    el.classList.add("movements__type--deposit");
+  } else {
+    el.classList.add("movements__type--withdrawal");
+  }
+};
+
+const transactionList = (acc) => {
+  containerMovements.textContent = "";
+  let reverseArray = acc.movements.slice().reverse();
+
+  reverseArray.forEach((mov, i) => {
+    const parentRow = document.createElement("div");
+    parentRow.className = "movements__row";
+
+    const movementsType = document.createElement("div");
+    movementsType.className = "movements__type";
+
+    checkSign(mov, movementsType);
+    movementsType.textContent = `${i + 1} ${
+      mov >= 0 ? "deposit" : "withdrawal"
+    }`;
+
+    const movementValue = document.createElement("div");
+    movementValue.className = "movements__value";
+    movementValue.textContent = `CHF ${mov}`;
+
+    parentRow.append(movementsType, movementValue);
+    containerMovements.insertAdjacentElement("afterbegin", parentRow);
+  });
+};
 
 btnLogin.addEventListener("click", function (e) {
   try {
@@ -116,6 +149,7 @@ btnLogin.addEventListener("click", function (e) {
     calculateBalance(currentAccount);
     sumIn(currentAccount);
     sumOut(currentAccount);
+    transactionList(currentAccount);
     message(`Welcome ${currentAccount.owner}`);
   } catch (err) {
     message(err.message, true);
