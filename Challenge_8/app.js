@@ -40,6 +40,8 @@ const inputLoginPin = document.querySelector(".login__input--pin");
 const inputTransferTo = document.querySelector(".form__input--to");
 const inputTransferAmount = document.querySelector(".form__input--amount");
 
+const containerOperation = document.querySelector(".operation");
+
 let currentAccount;
 
 const matchUser = (username, pin) => {
@@ -73,7 +75,8 @@ const calculateBalance = (acc) => {
       currentBalance += num;
     }
   }
-  labelBalance.textContent = currentBalance;  
+  labelBalance.textContent = currentBalance;
+  return currentBalance;
 };
 
 const sumIn = (acc) => {
@@ -141,6 +144,54 @@ const transactionList = (acc) => {
   });
 };
 
+const userExists = (user) => {
+  if (user === "aa" || user === "bb" || user === "cc") {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const enoughMoney = (acc, amount) => {
+  let currentBalance = calculateBalance(acc);
+  if (amount <= currentBalance && currentBalance - amount >= 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const messageTransfer = (text, error) => {
+  const validationMessage = document.createElement("h2");
+
+  validationMessage.textContent = text;
+  error
+    ? ((validationMessage.style.color = "var(--withdrawal)"),
+      (validationMessage.className = "valid"))
+    : ((validationMessage.style.color = "var(--deposit)"),
+      (validationMessage.className = "invalid"));
+};
+
+console.log("is enough money in global scope: " + enoughMoney(account1, 10000));
+
+const transferMoney = (srcAcc, destAcc, amount) => {
+  console.log("the source user inside transfer money function:" + srcAcc);
+  console.log("the dest user inside transfer money function:" + destAcc);
+  console.log(
+    "the user exist inside transfer money function? " + userExists(destAcc)
+  );
+  console.log(
+    "is enough money inside transfer money? " + enoughMoney(srcAcc, amount)
+  );
+
+  if (userExists(destAcc) && enoughMoney(srcAcc, amount)) {
+    srcAcc.movements.push(-amount);
+    destAcc.movements.push(amount);
+    containerOperation.append(validationMessage);
+    containerOperation.insertAdjacentHTML("afterend", containerOperation);
+  }
+};
+
 btnLogin.addEventListener("click", function (e) {
   try {
     e.preventDefault();
@@ -153,6 +204,23 @@ btnLogin.addEventListener("click", function (e) {
     message(`Welcome ${currentAccount.owner}`);
   } catch (err) {
     message(err.message, true);
+  }
+});
+
+btnTransfer.addEventListener("click", function (e) {
+  try {
+    e.preventDefault();
+    currentAccount = matchUser(inputLoginUsername.value, +inputLoginPin.value);
+    console.log(currentAccount.username);
+    console.log(inputTransferTo.value);
+    console.log(inputTransferAmount.value);
+    transferMoney(
+      currentAccount.username,
+      inputTransferTo.value,
+      inputTransferAmount.value
+    );
+  } catch (err) {
+    messageTransfer(err.message, true);
   }
 });
 
