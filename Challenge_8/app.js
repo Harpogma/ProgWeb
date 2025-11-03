@@ -121,7 +121,7 @@ const checkSign = (mov, el) => {
 
 const transactionList = (acc) => {
   containerMovements.textContent = "";
-  let reverseArray = acc.movements.slice().reverse();
+  let reverseArray = acc.movements.slice();
 
   reverseArray.forEach((mov, i) => {
     const parentRow = document.createElement("div");
@@ -145,11 +145,12 @@ const transactionList = (acc) => {
 };
 
 const userExists = (user) => {
-  if (user === "aa" || user === "bb" || user === "cc") {
-    return true;
-  } else {
-    return false;
+  for (let i = 0; i < accounts.length; i++) {
+    if (accounts[i].username === user) {
+      return accounts[i];
+    }
   }
+  return false;
 };
 
 const enoughMoney = (acc, amount) => {
@@ -163,33 +164,26 @@ const enoughMoney = (acc, amount) => {
 
 const messageTransfer = (text, error) => {
   const validationMessage = document.createElement("h2");
-
   validationMessage.textContent = text;
-  error
-    ? ((validationMessage.style.color = "var(--withdrawal)"),
-      (validationMessage.className = "valid"))
-    : ((validationMessage.style.color = "var(--deposit)"),
-      (validationMessage.className = "invalid"));
+  validationMessage.style.color = error
+    ? "var(--withdrawal)"
+    : "var(--deposit)";
+  // validationMessage.className = error ? "valid" : "invalid";
+  containerOperation.appendChild(validationMessage);
 };
 
-console.log("is enough money in global scope: " + enoughMoney(account1, 10000));
-
 const transferMoney = (srcAcc, destAcc, amount) => {
-  console.log("the source user inside transfer money function:" + srcAcc);
-  console.log("the dest user inside transfer money function:" + destAcc);
-  console.log(
-    "the user exist inside transfer money function? " + userExists(destAcc)
-  );
-  console.log(
-    "is enough money inside transfer money? " + enoughMoney(srcAcc, amount)
-  );
-
-  if (userExists(destAcc) && enoughMoney(srcAcc, amount)) {
-    srcAcc.movements.push(-amount);
-    destAcc.movements.push(amount);
-    containerOperation.append(validationMessage);
-    containerOperation.insertAdjacentHTML("afterend", containerOperation);
+  if (!enoughMoney(srcAcc, amount)) {
+    messageTransfer("Not enough funds", true);
   }
+
+  srcAcc.movements.push(-amount);
+  destAcc.movements.push(amount);
+
+  calculateBalance(srcAcc);
+  sumOut(srcAcc);
+  transactionList(srcAcc);
+  messageTransfer("Transfer successful", false);
 };
 
 btnLogin.addEventListener("click", function (e) {
@@ -208,19 +202,26 @@ btnLogin.addEventListener("click", function (e) {
 });
 
 btnTransfer.addEventListener("click", function (e) {
-  try {
-    e.preventDefault();
-    currentAccount = matchUser(inputLoginUsername.value, +inputLoginPin.value);
-    console.log(currentAccount.username);
-    console.log(inputTransferTo.value);
-    console.log(inputTransferAmount.value);
-    transferMoney(
-      currentAccount.username,
-      inputTransferTo.value,
-      inputTransferAmount.value
-    );
-  } catch (err) {
-    messageTransfer(err.message, true);
+  e.preventDefault();
+
+  const amount = Number(inputTransferAmount.value);
+  const destAcc = userExists(inputTransferTo.value);
+
+  if (!amount || amount <= 0) {
+    messageTransfer("Enter a valid amount", true);
+    return;
   }
+
+  if (!destAcc) {
+    messageTransfer("Destination account not found", true);
+    return;
+  }
+
+  if (destAcc.username === currentAccount.username) {
+    messageTransfer("You cannot transfer money to yourself", true);
+    return;
+  }
+
+  transferMoney(currentAccount, destAcc, amount);
 });
 

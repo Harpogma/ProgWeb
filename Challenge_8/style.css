@@ -274,3 +274,11 @@ h2 {
   cursor: pointer;
   transition: all 0.3s;
 }
+
+.valid {
+  color: var(--deposit);
+}
+
+.invalid {
+  color: var(--withdrawal);
+}
